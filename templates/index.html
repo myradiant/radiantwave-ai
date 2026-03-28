@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radiant AI</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #chat {
+      height: 400px;
+      overflow-y: auto;
+      margin: 20px;
+    }
+    input {
+      width: 60%;
+      padding: 10px;
+    }
+    button {
+      padding: 10px;
+      background: #f5c542;
+      border: none;
+      cursor: pointer;
+    }
+    .user { text-align: right; }
+    .ai { text-align: left; color: #f5c542; }
+  </style>
+</head>
+<body>
+
+<h1>🌟 Radiant AI</h1>
+
+<div id="chat"></div>
+
+<input id="message" placeholder="Ask Radiant..." />
+<button onclick="send()">Send</button>
+
+<script>
+async function send() {
+  const msg = document.getElementById("message").value;
+  if (!msg) return;
+
+  const res = await fetch("/chat", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({message: msg})
+  });
+  const data = await res.json();
+
+  const chat = document.getElementById("chat");
+  chat.innerHTML += "<p class='user'><b>You:</b> " + msg + "</p>";
+  chat.innerHTML += "<p class='ai'><b>Radiant:</b> " + data.content + "</p>";
+
+  document.getElementById("message").value = "";
+  chat.scrollTop = chat.scrollHeight;
+}
+</script>
+
+</body>
+</html>
