@@ -1,10 +1,14 @@
 from flask import Flask, request, jsonify, render_template
 import requests
+import os  # <-- import os to read environment variables
 
 app = Flask(__name__)
 
-# 🔑 Replace this with your OpenAI API key
-OPENAI_API_KEY = "YOUR_API_KEY"
+# 🔑 Use environment variable for OpenAI API key
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
+if not OPENAI_API_KEY:
+    raise ValueError("OpenAI API key not found. Set OPENAI_API_KEY in environment variables.")
 
 @app.route("/")
 def home():
