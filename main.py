@@ -4,8 +4,8 @@ import requests
 
 app = Flask(__name__)
 
-# Test mode vs real AI
-USE_API = False  # Set True if you have OpenAI key in Replit secrets
+# Toggle for using real OpenAI API
+USE_API = False  # Set True after adding OpenAI secret
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
@@ -29,7 +29,7 @@ def chat():
         # Test mode response
         return jsonify({"content": f"(Test Mode) You said: {user_msg}"})
 
-    # Real AI mode
+    # Real AI response
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
