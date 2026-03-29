@@ -4,16 +4,13 @@ import requests
 
 app = Flask(__name__)
 
-# Toggle between test mode and real AI
-USE_API = True  # Set to True to use OpenAI, False for test mode
+# Test mode vs real AI
+USE_API = False  # Set True if you have OpenAI key in Replit secrets
 
-# Get API key from Replit Secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-print("🔥 RADIANT AI RUNNING 🔥")
-print("USE_API =", USE_API)
 if USE_API and not OPENAI_API_KEY:
-    print("⚠️ WARNING: OPENAI_API_KEY not found. Running in test mode.")
+    print("⚠️ OPENAI_API_KEY missing, running in test mode")
     USE_API = False
 
 @app.route("/")
@@ -29,10 +26,10 @@ def chat():
         return jsonify({"content": "No message received"})
 
     if not USE_API:
-        # Test mode (no API)
+        # Test mode response
         return jsonify({"content": f"(Test Mode) You said: {user_msg}"})
 
-    # Real AI mode with safe handling
+    # Real AI mode
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -43,14 +40,13 @@ def chat():
             json={
                 "model": "gpt-4o-mini",
                 "messages": [
-                    {"role": "system", "content": "You are a helpful AI assistant."},
+                    {"role": "system", "content": "You are Radiant AI, a helpful assistant."},
                     {"role": "user", "content": user_msg}
                 ],
             },
         )
-
         result = response.json()
-        print("DEBUG RESPONSE:", result)  # <-- very important for troubleshooting
+        print("DEBUG RESPONSE:", result)
 
         if "choices" in result and len(result["choices"]) > 0:
             ai_reply = result["choices"][0]["message"]["content"]
