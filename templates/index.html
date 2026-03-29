@@ -1,62 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Radiant AI</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-    }
-    #chat {
-      height: 400px;
-      overflow-y: auto;
-      margin: 20px;
-    }
-    input {
-      width: 60%;
-      padding: 10px;
-    }
-    button {
-      padding: 10px;
-      background: #f5c542;
-      border: none;
-      cursor: pointer;
-    }
-    .user { text-align: right; }
-    .ai { text-align: left; color: #f5c542; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radiant AI Chat</title>
+<style>
+body { font-family: Arial; background: #f4f6fc; padding: 20px; max-width: 600px; margin: auto; }
+h1 { text-align: center; color: #4a00e0; }
+#chat { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; background: white; border-radius: 10px; }
+.message { margin: 10px 0; padding: 8px 12px; border-radius: 15px; max-width: 80%; word-wrap: break-word; display: flex; align-items: center; }
+.user { background: #d0f0fd; color: #0077b6; margin-left: auto; justify-content: flex-end; }
+.ai { background: #e0d7fd; color: #4a00e0; margin-right: auto; justify-content: flex-start; }
+.user .avatar, .ai .avatar { width: 30px; height: 30px; border-radius: 50%; margin: 0 8px; }
+#message { width: 75%; padding: 10px; border-radius: 10px; border: 1px solid #ccc; }
+button { padding: 10px 15px; border-radius: 10px; border: none; background: #4a00e0; color: white; cursor: pointer; }
+button:hover { background: #6a00ff; }
+#typing { font-style: italic; color: gray; display: none; margin-top: 5px; }
+</style>
 </head>
 <body>
-
-<h1>🌟 Radiant AI</h1>
-
+<h1>Radiant AI Chat</h1>
 <div id="chat"></div>
-
-<input id="message" placeholder="Ask Radiant..." />
-<button onclick="send()">Send</button>
+<div id="typing">Radiant AI is typing...</div>
+<input id="message" placeholder="Type your message..." />
+<button onclick="sendMessage()">Send</button>
 
 <script>
-async function send() {
-  const msg = document.getElementById("message").value;
-  if (!msg) return;
+const messageBox = document.getElementById("message");
+const chat = document.getElementById("chat");
+const typing = document.getElementById("typing");
 
-  const res = await fetch("/chat", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({message: msg})
-  });
-  const data = await res.json();
+messageBox.addEventListener("keypress", function(e){
+    if(e.key === "Enter"){ sendMessage(); }
+});
 
-  const chat = document.getElementById("chat");
-  chat.innerHTML += "<p class='user'><b>You:</b> " + msg + "</p>";
-  chat.innerHTML += "<p class='ai'><b>Radiant:</b> " + data.content + "</p>";
+async function sendMessage() {
+    const message = messageBox.value.trim();
+    if(!message) return;
 
-  document.getElementById("message").value = "";
-  chat.scrollTop = chat.scrollHeight;
+    const userDiv = document.createElement("div");
+    userDiv.className = "message user";
+    userDiv.innerHTML = `<span class="avatar">👤</span>${message}`;
+    chat.appendChild(userDiv);
+
+    typing.style.display = "block";
+
+    const response = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+    });
+    const data = await response.json();
+
+    typing.style.display = "none";
+
+    const aiDiv = document.createElement("div");
+    aiDiv.className = "message ai";
+    aiDiv.innerHTML = `<span class="avatar">🤖</span>${data.content}`;
+    chat.appendChild(aiDiv);
+
+    chat.scrollTop = chat.scrollHeight;
+    messageBox.value = "";
 }
 </script>
-
 </body>
 </html>
