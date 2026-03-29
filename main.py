@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Get API key from Replit Secrets
+# Get OpenAI key from Replit secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/")
@@ -36,13 +36,8 @@ def chat():
                 "max_tokens": 200,
             },
         )
-
         result = response.json()
-
-        print(result)  # DEBUG
-
         ai_reply = result["choices"][0]["message"]["content"]
-
     except Exception as e:
         ai_reply = f"Error: {str(e)}"
 
