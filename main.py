@@ -5,16 +5,20 @@ import requests
 app = Flask(__name__)
 
 # Toggle between test mode and real AI
-USE_API = False  # Change to True when your API key is ready
+USE_API = True  # Set to True to use OpenAI, False for test mode
 
-# Read API key from Replit Secrets
+# Get API key from Replit Secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
+print("🔥 RADIANT AI RUNNING 🔥")
+print("USE_API =", USE_API)
+if USE_API and not OPENAI_API_KEY:
+    print("⚠️ WARNING: OPENAI_API_KEY not found. Running in test mode.")
+    USE_API = False
 
 @app.route("/")
 def home():
     return render_template("index.html")
-
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -25,10 +29,10 @@ def chat():
         return jsonify({"content": "No message received"})
 
     if not USE_API:
-        # Test mode (no AI)
+        # Test mode (no API)
         return jsonify({"content": f"(Test Mode) You said: {user_msg}"})
 
-    # Real AI mode
+    # Real AI mode with safe handling
     try:
         response = requests.post(
             "https://api.openai.com/v1/chat/completions",
@@ -44,15 +48,19 @@ def chat():
                 ],
             },
         )
-        result = response.json()
-        print("DEBUG:", result)
 
-        if "choices" in result:
-            reply = result["choices"][0]["message"]["content"]
+        result = response.json()
+        print("DEBUG RESPONSE:", result)  # <-- very important for troubleshooting
+
+        if "choices" in result and len(result["choices"]) > 0:
+            ai_reply = result["choices"][0]["message"]["content"]
         else:
-            reply = "API Error: " + str(result)
+            ai_reply = "API returned unexpected response: " + str(result)
 
     except Exception as e:
-        reply = f"Error: {str(e)}"
+        ai_reply = f"Error calling API: {str(e)}"
 
-    return jsonify({"content": reply})
+    return jsonify({"content": ai_reply})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
