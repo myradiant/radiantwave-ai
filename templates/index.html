@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radiant AI Chat</title>
 <style>
-  body {
+body {
     margin: 0;
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
@@ -14,8 +14,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  .chat-container {
+}
+.chat-container {
     background: rgba(0,0,0,0.4);
     width: 90%;
     max-width: 450px;
@@ -24,58 +24,58 @@
     display: flex;
     flex-direction: column;
     height: 550px;
-  }
-  .header {
+}
+.header {
     font-size: 1.5em;
     font-weight: bold;
     margin-bottom: 10px;
     display: flex;
     align-items: center;
-  }
-  .header img {
+}
+.header img {
     width: 35px;
     height: 35px;
     border-radius: 50%;
     margin-right: 10px;
-  }
-  .messages {
+}
+.messages {
     flex: 1;
     overflow-y: auto;
     margin-bottom: 10px;
-  }
-  .message {
+}
+.message {
     margin: 5px 0;
     padding: 10px;
     border-radius: 10px;
     display: flex;
     align-items: center;
-  }
-  .message.user {
+}
+.message.user {
     background: rgba(255,255,255,0.3);
     align-self: flex-end;
     justify-content: flex-end;
-  }
-  .message.ai {
+}
+.message.ai {
     background: rgba(255,255,255,0.1);
     align-self: flex-start;
     justify-content: flex-start;
-  }
-  .message img {
+}
+.message img {
     width: 25px;
     height: 25px;
     border-radius: 50%;
     margin-right: 8px;
-  }
-  .input-container {
+}
+.input-container {
     display: flex;
-  }
-  input {
+}
+input {
     flex: 1;
     padding: 10px;
     border-radius: 10px;
     border: none;
-  }
-  button {
+}
+button {
     margin-left: 10px;
     padding: 10px;
     border-radius: 10px;
@@ -83,13 +83,13 @@
     background: #2575fc;
     color: white;
     cursor: pointer;
-  }
+}
 </style>
 </head>
 <body>
 <div class="chat-container">
   <div class="header">
-    <img src="https://i.imgur.com/4M7IWwP.png" alt="AI Icon">
+    <img src="/static/ai.png" alt="AI Icon">
     Radiant AI
   </div>
   <div class="messages" id="messages"></div>
@@ -101,40 +101,39 @@
 
 <script>
 async function sendMessage() {
-  const input = document.getElementById("messageInput");
-  const msg = input.value.trim();
-  if (!msg) return;
+    const input = document.getElementById("messageInput");
+    const msg = input.value.trim();
+    if (!msg) return;
 
-  const messagesDiv = document.getElementById("messages");
+    const messagesDiv = document.getElementById("messages");
 
-  // Add user message
-  const userDiv = document.createElement("div");
-  userDiv.className = "message user";
-  userDiv.innerHTML = `<span>${msg}</span><img src="https://i.imgur.com/8Km9tLL.png" alt="User">`;
-  messagesDiv.appendChild(userDiv);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-  input.value = "";
-
-  // Send to backend
-  try {
-    const res = await fetch("/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: msg })
-    });
-    const data = await res.json();
-    const aiDiv = document.createElement("div");
-    aiDiv.className = "message ai";
-    aiDiv.innerHTML = `<img src="https://i.imgur.com/4M7IWwP.png" alt="AI"> <span>${data.content}</span>`;
-    messagesDiv.appendChild(aiDiv);
+    // User message
+    const userDiv = document.createElement("div");
+    userDiv.className = "message user";
+    userDiv.innerHTML = `<span>${msg}</span><img src="/static/user.png" alt="User">`;
+    messagesDiv.appendChild(userDiv);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  } catch (err) {
-    const errDiv = document.createElement("div");
-    errDiv.className = "message ai";
-    errDiv.textContent = "AI Error: " + err;
-    messagesDiv.appendChild(errDiv);
-  }
+
+    input.value = "";
+
+    try {
+        const res = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: msg })
+        });
+        const data = await res.json();
+        const aiDiv = document.createElement("div");
+        aiDiv.className = "message ai";
+        aiDiv.innerHTML = `<img src="/static/ai.png" alt="AI"> <span>${data.content}</span>`;
+        messagesDiv.appendChild(aiDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    } catch (err) {
+        const errDiv = document.createElement("div");
+        errDiv.className = "message ai";
+        errDiv.textContent = "AI Error: " + err;
+        messagesDiv.appendChild(errDiv);
+    }
 }
 </script>
 </body>
