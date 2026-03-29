@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kimi-style AI Chat</title>
+<title>Radiant AI Chat</title>
 <style>
   body {
     margin: 0;
@@ -72,8 +72,9 @@ async function sendMessage() {
   const msg = input.value.trim();
   if (!msg) return;
 
-  // Add user message to chat
   const messagesDiv = document.getElementById("messages");
+
+  // Add user message
   const userDiv = document.createElement("div");
   userDiv.className = "message user";
   userDiv.textContent = msg;
@@ -82,7 +83,6 @@ async function sendMessage() {
 
   input.value = "";
 
-  // Send to backend
   try {
     const res = await fetch("/chat", {
       method: "POST",
