@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Radiant AI Chat</title>
+<style>
+body {
+    margin: 0;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+}
+#chatContainer {
+    width: 400px;
+    height: 600px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+#chatWindow {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f0f4ff;
+}
+.message {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    word-wrap: break-word;
+}
+.message.show {opacity:1; transform:translateY(0);}
+.message.user {background:#667eea; color:#fff; align-self:flex-end; border-bottom-right-radius:0;}
+.message.ai {background:#e2e8f0; color:#333; align-self:flex-start; border-bottom-left-radius:0; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+.ai-icon {width:28px; height:28px; background:url('https://i.imgur.com/6QzXbZK.png') no-repeat center; background-size:cover; border-radius:50%; flex-shrink:0; animation:none;}
+#inputArea {display:flex; padding:10px; border-top:1px solid #ddd; background:#fff;}
+#userMessage {flex:1; padding:10px 14px; border-radius:20px; border:1px solid #ccc; outline:none; resize:none;}
+#sendBtn {margin-left:10px; padding:10px 20px; border-radius:20px; border:none; background:#667eea; color:#fff; cursor:pointer; transition:0.2s;}
+#sendBtn:hover {background:#5a67d8;}
+#typingIndicator {display:none; align-items:center; gap:8px; font-style:italic; color:#555; padding-left:4px;}
+@keyframes bounce {0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.typing-dots span {display:inline-block;width:6px;height:6px;margin:0 2px;background:#555;border-radius:50%;animation:dot 1.4s infinite;opacity:0.3;}
+.typing-dots span:nth-child(1){animation-delay:0s;}
+.typing-dots span:nth-child(2){animation-delay:0.2s;}
+.typing-dots span:nth-child(3){animation-delay:0.4s;}
+@keyframes dot {0%,80%,100%{transform:scale(0);opacity:0.3;}40%{transform:scale(1);opacity:1;}}
+</style>
+</head>
+<body>
+<div id="chatContainer">
+    <div id="chatWindow"></div>
+    <div id="typingIndicator">
+        <div class="ai-icon"></div>
+        <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div id="inputArea">
+        <textarea id="userMessage" placeholder="Type your message..." rows="1"></textarea>
+        <button id="sendBtn">Send</button>
+    </div>
+</div>
+<script>
+const sendBtn=document.getElementById("sendBtn");
+const chatWindow=document.getElementById("chatWindow");
+const userMessageInput=document.getElementById("userMessage");
+const typingIndicator=document.getElementById("typingIndicator");
+const typingIcon=typingIndicator.querySelector(".ai-icon");
+
+function addMessage(content,type){
+    const msgDiv=document.createElement("div");
+    msgDiv.classList.add("message",type);
+    const icon=document.createElement("div");
+    icon.classList.add("ai-icon");
+    const text=document.createElement("div");
+    text.innerHTML=content;
+    if(type==="user"){msgDiv.appendChild(text);msgDiv.appendChild(icon);}
+    else{msgDiv.appendChild(icon);msgDiv.appendChild(text);}
+    chatWindow.appendChild(msgDiv);
+    setTimeout(()=>msgDiv.classList.add("show"),10);
+    chatWindow.scrollTop=chatWindow.scrollHeight;
+}
+
+async function sendMessage(){
+    const message=userMessageInput.value.trim();
+    if(!message) return;
+    addMessage(`You: ${message}`,"user");
+    userMessageInput.value="";
+    typingIndicator.style.display="flex";
+    typingIcon.style.animation="bounce 0.5s infinite";
+    try{
+        const response=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message})});
+        const data=await response.json();
+        typingIndicator.style.display="none";
+        typingIcon.style.animation="none";
+        addMessage(`AI: ${data.content}`,"ai");
+    }catch(err){
+        typingIndicator.style.display="none";
+        typingIcon.style.animation="none";
+        addMessage("AI: Error sending message","ai");
+        console.error(err);
+    }
+}
+
+sendBtn.addEventListener("click",sendMessage);
+userMessageInput.addEventListener("keyup",(e)=>{if(e.key==="Enter"&&!e.shiftKey) sendMessage();});
+</script>
+</body>
+</html>
