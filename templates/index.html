@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Kimi Chat</title>
+<title>Kimi AI Chat</title>
 <style>
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: #f4f7fb;
+        background: linear-gradient(135deg, #667eea, #764ba2);
         display: flex;
         justify-content: center;
         align-items: center;
         height: 100vh;
+        margin: 0;
     }
     #chatContainer {
         width: 400px;
+        height: 600px;
         background: #fff;
         border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -28,7 +30,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        background: #e6f0ff;
+        background: #f0f4ff;
     }
     .message {
         max-width: 80%;
@@ -47,20 +49,20 @@
         transform: translateY(0);
     }
     .message.user {
-        background: #007bff;
+        background: #667eea;
         color: #fff;
         align-self: flex-end;
         border-bottom-right-radius: 0;
     }
     .message.ai {
-        background: #f0f0f0;
+        background: #e2e8f0;
         color: #333;
         align-self: flex-start;
         border-bottom-left-radius: 0;
     }
     .kimi-icon {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
         background: url('https://i.imgur.com/6QzXbZK.png') no-repeat center;
         background-size: cover;
         flex-shrink: 0;
@@ -84,20 +86,20 @@
         padding: 10px 20px;
         border-radius: 20px;
         border: none;
-        background: #007bff;
+        background: #667eea;
         color: #fff;
         cursor: pointer;
         transition: 0.2s;
     }
-    #sendBtn:hover { background: #0056b3; }
+    #sendBtn:hover { background: #5a67d8; }
 
-    /* Typing indicator */
     #typingIndicator {
         display: none;
         align-items: center;
         gap: 8px;
         font-style: italic;
         color: #555;
+        padding-left: 4px;
     }
 </style>
 </head>
@@ -137,7 +139,6 @@ function addMessage(content, type) {
 
     chatWindow.appendChild(msgDiv);
 
-    // Trigger animation
     setTimeout(() => msgDiv.classList.add("show"), 10);
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
@@ -149,7 +150,6 @@ async function sendMessage() {
     addMessage(`You: ${message}`, "user");
     userMessageInput.value = "";
 
-    // Show typing indicator
     typingIndicator.style.display = "flex";
 
     try {
@@ -159,7 +159,6 @@ async function sendMessage() {
             body: JSON.stringify({ message })
         });
         const data = await response.json();
-
         typingIndicator.style.display = "none";
         addMessage(`AI: ${data.content}`, "ai");
     } catch (err) {
