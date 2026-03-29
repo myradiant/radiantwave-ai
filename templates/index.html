@@ -1,170 +1,162 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Radiant AI</title>
-
+<title>Kimi Chat</title>
 <style>
-body {
-    font-family: Arial;
-    background: #0b1a3a;
-    color: white;
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-}
+    /* Page layout */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f4f7fb;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    #chatContainer {
+        width: 400px;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
 
-h1 {
-    text-align: center;
-}
+    /* Chat window */
+    #chatWindow {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #e6f0ff;
+    }
 
-#chat {
-    height: 400px;
-    overflow-y: auto;
-    background: #111c44;
-    padding: 10px;
-    border-radius: 10px;
-}
+    /* Messages */
+    .message {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        word-wrap: break-word;
+    }
+    .message.user {
+        background: #007bff;
+        color: #fff;
+        align-self: flex-end;
+        border-bottom-right-radius: 0;
+    }
+    .message.ai {
+        background: #f0f0f0;
+        color: #333;
+        align-self: flex-start;
+        border-bottom-left-radius: 0;
+    }
 
-.message {
-    display: flex;
-    margin: 10px 0;
-}
+    /* Kimi icon */
+    .kimi-icon {
+        width: 24px;
+        height: 24px;
+        background: url('https://i.imgur.com/6QzXbZK.png') no-repeat center;
+        background-size: cover;
+        flex-shrink: 0;
+        border-radius: 50%;
+    }
 
-.user {
-    justify-content: flex-end;
-}
-
-.ai {
-    justify-content: flex-start;
-}
-
-.bubble {
-    padding: 10px;
-    border-radius: 15px;
-    max-width: 70%;
-}
-
-.user .bubble {
-    background: #ffc107;
-    color: black;
-}
-
-.ai .bubble {
-    background: #2a3cff;
-}
-
-.avatar {
-    margin: 0 8px;
-    font-size: 14px;
-}
-
-#input-area {
-    display: flex;
-    margin-top: 10px;
-}
-
-input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-}
-
-button {
-    margin-left: 5px;
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    background: #ffc107;
-}
-
-#typing {
-    font-size: 12px;
-    color: #aaa;
-    display: none;
-}
+    /* Input area */
+    #inputArea {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        background: #fff;
+    }
+    #userMessage {
+        flex: 1;
+        padding: 10px 14px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        outline: none;
+    }
+    #sendBtn {
+        margin-left: 10px;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        background: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    #sendBtn:hover {
+        background: #0056b3;
+    }
 </style>
 </head>
-
 <body>
-
-<h1>✨ Radiant AI</h1>
-
-<div id="chat"></div>
-<div id="typing">Radiant AI is typing...</div>
-
-<div id="input-area">
-    <input id="message" placeholder="Ask Radiant..." />
-    <button id="sendBtn">Send</button>
+<div id="chatContainer">
+    <div id="chatWindow"></div>
+    <div id="inputArea">
+        <input type="text" id="userMessage" placeholder="Type your message..." />
+        <button id="sendBtn">Send</button>
+    </div>
 </div>
 
 <script>
-const chat = document.getElementById("chat");
-const input = document.getElementById("message");
-const button = document.getElementById("sendBtn");
-const typing = document.getElementById("typing");
+const sendBtn = document.getElementById("sendBtn");
+const chatWindow = document.getElementById("chatWindow");
+const userMessageInput = document.getElementById("userMessage");
 
-function addMessage(text, sender) {
-    const row = document.createElement("div");
-    row.className = "message " + sender;
+// Function to add a message bubble
+function addMessage(content, type) {
+    const msgDiv = document.createElement("div");
+    msgDiv.classList.add("message", type);
 
-    const avatar = document.createElement("div");
-    avatar.className = "avatar";
-    avatar.innerText = sender === "user" ? "You" : "AI";
+    const icon = document.createElement("div");
+    icon.classList.add("kimi-icon");
 
-    const bubble = document.createElement("div");
-    bubble.className = "bubble";
-    bubble.innerText = text;
+    const text = document.createElement("div");
+    text.innerHTML = content;
 
-    if (sender === "user") {
-        row.appendChild(bubble);
-        row.appendChild(avatar);
+    if (type === "user") {
+        msgDiv.appendChild(text);
+        msgDiv.appendChild(icon);
     } else {
-        row.appendChild(avatar);
-        row.appendChild(bubble);
+        msgDiv.appendChild(icon);
+        msgDiv.appendChild(text);
     }
 
-    chat.appendChild(row);
-    chat.scrollTop = chat.scrollHeight;
+    chatWindow.appendChild(msgDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
 async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
+    const message = userMessageInput.value.trim();
+    if (!message) return;
 
-    addMessage(text, "user");
-    input.value = "";
-
-    typing.style.display = "block";
+    addMessage(`You: ${message}`, "user");
+    userMessageInput.value = "";
 
     try {
-        const res = await fetch("/chat", {
+        const response = await fetch("/chat", {
             method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({message: text})
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
         });
-
-        const data = await res.json();
-
-        typing.style.display = "none";
-
-        addMessage(data.content, "ai");
-
+        const data = await response.json();
+        addMessage(`AI: ${data.content}`, "ai");
     } catch (err) {
-        typing.style.display = "none";
-        addMessage("Error connecting to AI", "ai");
+        console.error("Error:", err);
     }
 }
 
-button.addEventListener("click", sendMessage);
-
-input.addEventListener("keypress", function(e){
-    if(e.key === "Enter"){
-        sendMessage();
-    }
+sendBtn.addEventListener("click", sendMessage);
+userMessageInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") sendMessage();
 });
 </script>
-
 </body>
 </html>
