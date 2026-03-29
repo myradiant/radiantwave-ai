@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-import os
 
 app = Flask(__name__)
 
@@ -11,8 +10,9 @@ def home():
 def chat():
     data = request.get_json()
     user_message = data.get("message")
-
-    # 🔥 SIMPLE TEST (no API yet)
+    
+    # 🔥 SIMPLE RESPONSE for testing
     return jsonify({"content": "You said: " + user_message})
 
-app.run(host="0.0.0.0", port=3000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=3000, debug=True)
