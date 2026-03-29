@@ -3,8 +3,6 @@ import requests
 import os
 
 app = Flask(__name__)
-
-# Get OpenAI key from Replit secrets
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 @app.route("/")
@@ -14,9 +12,8 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    user_message = data.get("message")
-
-    if not user_message:
+    msg = data.get("message")
+    if not msg:
         return jsonify({"content": "No message received"})
 
     try:
@@ -30,18 +27,18 @@ def chat():
                 "model": "gpt-4o-mini",
                 "messages": [
                     {"role": "system", "content": "You are Kimi, a friendly AI assistant."},
-                    {"role": "user", "content": user_message},
+                    {"role": "user", "content": msg}
                 ],
                 "temperature": 0.7,
-                "max_tokens": 200,
-            },
+                "max_tokens": 200
+            }
         )
         result = response.json()
-        ai_reply = result["choices"][0]["message"]["content"]
+        reply = result["choices"][0]["message"]["content"]
     except Exception as e:
-        ai_reply = f"Error: {str(e)}"
+        reply = f"Error: {str(e)}"
 
-    return jsonify({"content": ai_reply})
+    return jsonify({"content": reply})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000, debug=True)
