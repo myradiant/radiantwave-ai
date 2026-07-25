@@ -24,7 +24,7 @@ const Auth = {
     this.currentUser = { id: user.id, email: user.email, name: user.name, avatar: null }; Utils.storage.set('user', this.currentUser); this._notifyListeners(); return { user: this.currentUser };
   },
   async signOut() { if (DB.isConnected() && supabaseClient) await supabaseClient.auth.signOut(); this.currentUser = null; Utils.storage.remove('user'); this._notifyListeners(); },
-  async signInWithOAuth(provider) { if (!DB.isConnected() || !supabaseClient) throw new Error('OAuth requires Supabase connection'); const { data, error } = await supabaseClient.auth.signInWithOAuth({ provider, options: { redirectTo:https://github.com/myradiant/radiantwave-ai' } }); if (error) throw error; return data; },
+  async signInWithOAuth(provider) { if (!DB.isConnected() || !supabaseClient) throw new Error('OAuth requires Supabase connection'); const { data, error } = await supabaseClient.auth.signInWithOAuth({ provider, options: { redirectTo:'https://github.com/myradiant/radiantwave-ai' } }); if (error) throw error; return data; },
   async updateProfile(updates) {
     if (DB.isConnected() && supabaseClient) { const { data, error } = await supabaseClient.auth.updateUser({ data: updates }); if (error) throw error; this.currentUser = this._formatUser(data.user); this._notifyListeners(); return data; }
     if (this.currentUser) { this.currentUser = { ...this.currentUser, ...updates }; Utils.storage.set('user', this.currentUser); const users = Utils.storage.get('users') || []; const idx = users.findIndex(u => u.id === this.currentUser.id); if (idx >= 0) { users[idx] = { ...users[idx], ...updates }; Utils.storage.set('users', users); } this._notifyListeners(); }
