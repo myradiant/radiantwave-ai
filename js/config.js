@@ -1,5 +1,5 @@
 const CONFIG = {
-  supabase: { url: 'https://your-project.supabase.co', anonKey: 'your-anon-key' },
+  supabase: { url: 'https://yrotvozuphfztkwueewg.supabase.co', anonKey: 'sb_publishable_Zdt3PiSxooCOmvq3jX_3hQ_zcZf1SPw' },
   api: { baseUrl: 'http://localhost:8000', timeout: 30000 },
   personalities: [
     { id: 'general', name: 'General AI', icon: '\uD83E\uDD16', description: 'Your all-purpose intelligent assistant for any task.', accent: '#06b6d4', systemPrompt: 'You are RadiantWaves AI, a helpful, creative, and precise assistant. Provide clear, well-structured responses.' },
