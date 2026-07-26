@@ -244,24 +244,32 @@ const Chat = {
     if (sendBtn) sendBtn.disabled = false;
   },
 
-  callBackend: async function(userText) {
-    var response = await fetch(
-      CONFIG.supabase.url + '/functions/v1/chat-ai',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + CONFIG.supabase.anonKey
-        },
-        body: JSON.stringify({
-          message: userText,
-          personality: this.currentPersonality.name
-        })
-      }
-    );
+ callBackend: async function(userText) {
+    var url = CONFIG.supabase.url.replace(/\/$/, '') + '/functions/v1/smart-api';
+    console.log('Calling Edge Function at:', url);
 
-    if (!response.ok) throw new Error('HTTP ' + response.status);
+    var response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + CONFIG.supabase.anonKey
+      },
+      body: JSON.stringify({
+        message: userText,
+        personality: this.currentPersonality.name
+      })
+    });
+
+    console.log('Edge Function status:', response.status);
+
+    if (!response.ok) {
+      var errText = await response.text();
+      console.error('Edge Function error:', errText);
+      throw new Error('HTTP ' + response.status + ': ' + errText);
+    }
+
     var data = await response.json();
+    console.log('Edge Function response:', data);
     return data.response || 'No response received.';
   },
 
