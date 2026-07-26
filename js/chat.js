@@ -268,8 +268,15 @@ const Chat = {
       throw new Error('HTTP ' + response.status + ': ' + errText);
     }
 
-    var data = await response.json();
+   var data = await response.json();
     console.log('Edge Function response:', data);
+    
+    // Show actual error if OpenAI failed
+    if (data.error) {
+      console.error('OpenAI/Edge Error:', data);
+      return 'AI Error: ' + (data.openai_error?.message || data.error || 'Unknown error');
+    }
+    
     return data.response || 'No response received.';
   },
 
