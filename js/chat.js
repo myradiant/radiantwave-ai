@@ -245,20 +245,24 @@ const Chat = {
   },
 
   callBackend: async function(userText) {
-    var response = await fetch(CONFIG.api.baseUrl + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: userText,
-        personality: this.currentPersonality.id,
-        conversation_id: this.currentConversationId,
-        history: this.messages.slice(-10).map(function(m) { return { role: m.role, content: m.content }; })
-      })
-    });
+    var response = await fetch(
+      CONFIG.supabase.url + '/functions/v1/chat-ai',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + CONFIG.supabase.anonKey
+        },
+        body: JSON.stringify({
+          message: userText,
+          personality: this.currentPersonality.name
+        })
+      }
+    );
 
     if (!response.ok) throw new Error('HTTP ' + response.status);
     var data = await response.json();
-    return data.response || data.message || 'No response received.';
+    return data.response || 'No response received.';
   },
 
   getFallbackResponse: function(text) {
@@ -268,7 +272,7 @@ const Chat = {
       return 'Hello! I am ' + this.currentPersonality.name + '. How can I assist you today?';
     }
     if (lower.indexOf('code') >= 0 || lower.indexOf('python') >= 0 || lower.indexOf('javascript') >= 0) {
-      return 'I would love to help with your code! However, my backend connection is not active right now. Please connect your backend API to get full code assistance.';
+      return 'I would love to help with your code! However, my backend connection is not active right now.';
     }
     if (lower.indexOf('business') >= 0 || lower.indexOf('plan') >= 0) {
       return 'Great business question! To give you the best strategic advice, I need my backend connected.';
