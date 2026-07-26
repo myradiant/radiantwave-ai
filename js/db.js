@@ -111,8 +111,8 @@ const DB = {
     const msg = {
       id: Utils.generateId(),
       conversation_id: conversationId,
-      role,
-      content,
+      role: role,
+      content: content,
       personality_id: personalityId || 'general',
       created_at: new Date().toISOString()
     };
