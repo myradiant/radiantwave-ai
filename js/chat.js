@@ -273,8 +273,8 @@ const Chat = {
     
     // Show actual error if OpenAI failed
     if (data.error) {
-      console.error('OpenAI/Edge Error:', data);
-      return 'AI Error: ' + (data.openai_error?.message || data.error || 'Unknown error');
+      console.error('AI Error:', data);
+      return 'AI Error: ' + JSON.stringify(data);
     }
     
     return data.response || 'No response received.';
